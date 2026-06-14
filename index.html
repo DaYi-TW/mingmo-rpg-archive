@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>明末模擬器 RPG Archive</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="檔案導覽">
+        <div class="sidebar-head">
+          <div class="brand">
+            <div class="brand-mark">明</div>
+            <div>
+              <h1>明末模擬器</h1>
+              <p>RPG Archive</p>
+            </div>
+          </div>
+          <button id="menuToggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebarControls">選單</button>
+        </div>
+
+        <div id="sidebarControls" class="sidebar-controls">
+          <label class="field-label" for="roundSelect">回合</label>
+          <select id="roundSelect" class="select"></select>
+
+          <label class="field-label theme-label" for="themeSelect">背景</label>
+          <select id="themeSelect" class="select">
+            <option value="paper">紙色</option>
+            <option value="night">夜間</option>
+            <option value="jade">墨綠</option>
+            <option value="gray">冷灰</option>
+          </select>
+
+          <nav class="nav-block" aria-label="快速文件">
+            <button class="nav-item active" data-file="rpg/_index.md">現況總覽</button>
+            <button class="nav-item" data-file="rpg/military.md">軍力軍備</button>
+            <button class="nav-item" data-file="rpg/tech.md">科技工業</button>
+            <button class="nav-item" data-file="rpg/economy.md">財政產業</button>
+            <button class="nav-item" data-file="rpg/politics.md">政治法制</button>
+            <button class="nav-item" data-file="rpg/international.md">國際外交</button>
+            <button class="nav-item" data-file="rpg/events.md">大事記</button>
+            <button class="nav-item" data-file="rpg/project_timeline.md">專案時間表</button>
+            <button class="nav-item" data-file="rpg/personnel.md">人物卡</button>
+            <button class="nav-item" data-file="rpg/institutions.md">機關卡</button>
+            <button class="nav-item" data-file="rpg/laws.md">法律彙編</button>
+          </nav>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="document-title">
+            <span id="docType">現況總覽</span>
+            <strong id="docPath">rpg/_index.md</strong>
+          </div>
+          <div class="toolbar" role="toolbar" aria-label="文件操作">
+            <button id="storyBtn" class="tool-button" title="讀取本回故事">故事</button>
+            <button id="optionBtn" class="tool-button" title="讀取本回選項">選項</button>
+            <button id="cardBtn" class="tool-button" title="讀取本回現狀卡">現狀卡</button>
+            <button id="copyLinkBtn" class="icon-button" title="複製目前文件連結" aria-label="複製目前文件連結">⛓</button>
+          </div>
+        </header>
+
+        <section class="search-row" aria-label="搜尋文件">
+          <input id="searchInput" class="search-input" type="search" placeholder="搜尋目前文件，例如：TH-4、清廷、廣州一號">
+          <div id="searchCount" class="search-count">未搜尋</div>
+        </section>
+
+        <article id="content" class="markdown-body" aria-live="polite"></article>
+      </main>
+
+      <aside class="inspector" aria-label="閱讀資訊">
+        <section class="panel">
+          <h2>目前文件</h2>
+          <dl>
+            <dt>檔案</dt>
+            <dd id="metaFile">-</dd>
+            <dt>大小</dt>
+            <dd id="metaSize">-</dd>
+            <dt>段落</dt>
+            <dd id="metaHeadings">-</dd>
+          </dl>
+        </section>
+
+        <section class="panel">
+          <h2>快速跳轉</h2>
+          <div id="headingList" class="heading-list"></div>
+        </section>
+      </aside>
+    </div>
+
+    <nav class="mobile-reader-bar" aria-label="手機閱讀器工具列">
+      <button id="mobileChaptersBtn" class="reader-bar-button" type="button" aria-controls="chapterSheet" aria-expanded="false">
+        <span aria-hidden="true">☰</span>
+        <small>章節</small>
+      </button>
+      <button id="mobileStoryBtn" class="reader-bar-button" type="button">
+        <span aria-hidden="true">✦</span>
+        <small>故事</small>
+      </button>
+      <button id="mobileOptionBtn" class="reader-bar-button" type="button">
+        <span aria-hidden="true">◇</span>
+        <small>選項</small>
+      </button>
+      <button id="mobileCardBtn" class="reader-bar-button" type="button">
+        <span aria-hidden="true">▣</span>
+        <small>現狀卡</small>
+      </button>
+      <button id="mobileSettingsBtn" class="reader-bar-button" type="button" aria-controls="settingsSheet" aria-expanded="false">
+        <span aria-hidden="true">⚙</span>
+        <small>設定</small>
+      </button>
+    </nav>
+
+    <div id="sheetBackdrop" class="sheet-backdrop" hidden></div>
+    <section id="chapterSheet" class="chapter-sheet" aria-label="章節列表" aria-hidden="true">
+      <div class="sheet-handle"></div>
+      <header class="sheet-header">
+        <h2>回合章節</h2>
+        <button id="closeChapterSheetBtn" class="sheet-close" type="button" aria-label="關閉章節">×</button>
+      </header>
+      <div id="mobileHeadingList" class="mobile-heading-list"></div>
+    </section>
+
+    <section id="settingsSheet" class="chapter-sheet settings-sheet" aria-label="閱讀設定" aria-hidden="true">
+      <div class="sheet-handle"></div>
+      <header class="sheet-header">
+        <h2>設定</h2>
+        <button id="closeSettingsSheetBtn" class="sheet-close" type="button" aria-label="關閉設定">×</button>
+      </header>
+      <div class="settings-list">
+        <label class="field-label" for="mobileThemeSelect">背景</label>
+        <select id="mobileThemeSelect" class="select">
+          <option value="paper">紙色</option>
+          <option value="night">夜間</option>
+          <option value="jade">墨綠</option>
+          <option value="gray">冷灰</option>
+        </select>
+      </div>
+    </section>
+  </body>
+</html>
