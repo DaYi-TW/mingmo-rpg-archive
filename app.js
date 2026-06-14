@@ -31,6 +31,8 @@ const els = {
   settingsSheet: document.querySelector("#settingsSheet"),
   sheetBackdrop: document.querySelector("#sheetBackdrop"),
   closeChapterSheetBtn: document.querySelector("#closeChapterSheetBtn"),
+  roundAscBtn: document.querySelector("#roundAscBtn"),
+  roundDescBtn: document.querySelector("#roundDescBtn"),
   closeSettingsSheetBtn: document.querySelector("#closeSettingsSheetBtn"),
   mobileThemeSelect: document.querySelector("#mobileThemeSelect"),
   menuToggle: document.querySelector("#menuToggle"),
@@ -52,7 +54,7 @@ init();
 async function init() {
   try {
     state.manifest = await fetchJson("./rpg-manifest.json");
-    state.currentRound = state.manifest.latestRound;
+    state.currentRound = getSavedRound();
     buildRoundSelect();
     wireEvents();
     applySavedTheme();
@@ -80,6 +82,7 @@ function wireEvents() {
 
   els.roundSelect.addEventListener("change", () => {
     state.currentRound = Number(els.roundSelect.value);
+    saveCurrentRound();
     loadRoundFile("story");
   });
   els.themeSelect.addEventListener("change", () => setTheme(els.themeSelect.value));
@@ -95,6 +98,8 @@ function wireEvents() {
   els.closeChapterSheetBtn.addEventListener("click", closeChapterSheet);
   els.closeSettingsSheetBtn.addEventListener("click", closeSettingsSheet);
   els.sheetBackdrop.addEventListener("click", closeSheets);
+  els.roundAscBtn.addEventListener("click", () => setRoundOrder("asc"));
+  els.roundDescBtn.addEventListener("click", () => setRoundOrder("desc"));
   els.copyLinkBtn.addEventListener("click", copyCurrentLink);
   els.searchInput.addEventListener("input", () => renderMarkdown(state.currentMarkdown, els.searchInput.value));
   els.menuToggle.addEventListener("click", toggleMobileMenu);
@@ -138,6 +143,7 @@ function closeMobileMenu() {
 
 function loadRoundFile(type) {
   const round = state.currentRound;
+  saveCurrentRound();
   const map = {
     story: `rpg/story/story_${round}.md`,
     option: `rpg/story/option_${round}.md`,
@@ -327,9 +333,12 @@ function readingKey(file) {
 
 function buildMobileRoundList() {
   if (!state.manifest) return;
-  els.mobileHeadingList.innerHTML = state.manifest.rounds
-    .slice()
-    .reverse()
+  const order = getRoundOrder();
+  els.roundAscBtn.classList.toggle("active", order === "asc");
+  els.roundDescBtn.classList.toggle("active", order === "desc");
+  const rounds = state.manifest.rounds.slice();
+  if (order === "desc") rounds.reverse();
+  els.mobileHeadingList.innerHTML = rounds
     .map((round) => {
       const active = round === state.currentRound ? " active" : "";
       return `<button type="button" class="mobile-heading-jump${active}" data-round="${round}">第 ${round} 回合</button>`;
@@ -339,10 +348,30 @@ function buildMobileRoundList() {
     button.addEventListener("click", () => {
       state.currentRound = Number(button.dataset.round);
       els.roundSelect.value = String(state.currentRound);
+      saveCurrentRound();
       closeChapterSheet();
       loadRoundFile("story");
     });
   });
+}
+
+function getSavedRound() {
+  const saved = Number(localStorage.getItem("mingmo-reader-current-round"));
+  return state.manifest.rounds.includes(saved) ? saved : state.manifest.latestRound;
+}
+
+function saveCurrentRound() {
+  localStorage.setItem("mingmo-reader-current-round", String(state.currentRound));
+}
+
+function getRoundOrder() {
+  const saved = localStorage.getItem("mingmo-reader-round-order");
+  return saved === "asc" ? "asc" : "desc";
+}
+
+function setRoundOrder(order) {
+  localStorage.setItem("mingmo-reader-round-order", order);
+  buildMobileRoundList();
 }
 
 async function fetchJson(path) {
