@@ -13,6 +13,8 @@
   --mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
   --body: "Noto Serif TC", "Source Han Serif TC", "PMingLiU", serif;
   --ui: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --reader-font-size: 18px;
+  --reader-line-height: 1.82;
 }
 
 :root[data-theme="night"] {
@@ -161,6 +163,34 @@ input {
 
 .theme-label {
   margin-top: 14px;
+}
+
+.reader-setting {
+  margin-top: 14px;
+}
+
+.range-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.range-row .field-label {
+  margin-bottom: 0;
+}
+
+.range-value {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.range-input {
+  width: 100%;
+  accent-color: var(--red-dark);
+  cursor: pointer;
 }
 
 .select,
@@ -314,8 +344,8 @@ input {
   background: var(--paper-strong);
   box-shadow: var(--shadow);
   font-family: var(--body);
-  font-size: 18px;
-  line-height: 1.82;
+  font-size: var(--reader-font-size);
+  line-height: var(--reader-line-height);
 }
 
 .markdown-body h1,
@@ -656,6 +686,10 @@ input {
     padding: 4px 0 12px;
   }
 
+  .settings-list .reader-setting {
+    margin-top: 4px;
+  }
+
   .sidebar {
     display: none;
   }
@@ -747,8 +781,8 @@ input {
     margin-top: 10px;
     margin-bottom: 28px;
     padding: 22px 14px;
-    font-size: 16px;
-    line-height: 1.78;
+    font-size: var(--reader-font-size);
+    line-height: var(--reader-line-height);
   }
 
   .markdown-body h1 {

@@ -5,6 +5,11 @@ const state = {
   currentRound: 120,
 };
 
+const DEFAULT_READER_SETTINGS = {
+  fontSize: 18,
+  lineHeight: 1.82,
+};
+
 const els = {
   content: document.querySelector("#content"),
   roundSelect: document.querySelector("#roundSelect"),
@@ -35,6 +40,14 @@ const els = {
   roundDescBtn: document.querySelector("#roundDescBtn"),
   closeSettingsSheetBtn: document.querySelector("#closeSettingsSheetBtn"),
   mobileThemeSelect: document.querySelector("#mobileThemeSelect"),
+  fontSizeRange: document.querySelector("#fontSizeRange"),
+  fontSizeValue: document.querySelector("#fontSizeValue"),
+  lineHeightRange: document.querySelector("#lineHeightRange"),
+  lineHeightValue: document.querySelector("#lineHeightValue"),
+  mobileFontSizeRange: document.querySelector("#mobileFontSizeRange"),
+  mobileFontSizeValue: document.querySelector("#mobileFontSizeValue"),
+  mobileLineHeightRange: document.querySelector("#mobileLineHeightRange"),
+  mobileLineHeightValue: document.querySelector("#mobileLineHeightValue"),
   menuToggle: document.querySelector("#menuToggle"),
   sidebarControls: document.querySelector("#sidebarControls"),
 };
@@ -58,6 +71,7 @@ async function init() {
     buildRoundSelect();
     wireEvents();
     applySavedTheme();
+    applySavedReaderSettings();
     const initialFile = getFileFromHash() || "rpg/_index.md";
     await loadMarkdown(initialFile);
   } catch (error) {
@@ -104,6 +118,10 @@ function wireEvents() {
   els.searchInput.addEventListener("input", () => renderMarkdown(state.currentMarkdown, els.searchInput.value));
   els.menuToggle.addEventListener("click", toggleMobileMenu);
   els.mobileThemeSelect.addEventListener("change", () => setTheme(els.mobileThemeSelect.value));
+  els.fontSizeRange.addEventListener("input", () => setReaderFontSize(els.fontSizeRange.value));
+  els.mobileFontSizeRange.addEventListener("input", () => setReaderFontSize(els.mobileFontSizeRange.value));
+  els.lineHeightRange.addEventListener("input", () => setReaderLineHeight(els.lineHeightRange.value));
+  els.mobileLineHeightRange.addEventListener("input", () => setReaderLineHeight(els.mobileLineHeightRange.value));
   window.addEventListener("scroll", scheduleSaveReadingPosition, { passive: true });
 
   window.addEventListener("hashchange", () => {
@@ -126,6 +144,70 @@ function setTheme(theme) {
   localStorage.setItem("mingmo-reader-theme", theme);
   els.themeSelect.value = theme;
   els.mobileThemeSelect.value = theme;
+}
+
+function applySavedReaderSettings() {
+  const fontSize = clampNumber(
+    Number(localStorage.getItem("mingmo-reader-font-size")),
+    15,
+    24,
+    DEFAULT_READER_SETTINGS.fontSize,
+  );
+  const lineHeight = clampNumber(
+    Number(localStorage.getItem("mingmo-reader-line-height")),
+    1.5,
+    2.2,
+    DEFAULT_READER_SETTINGS.lineHeight,
+  );
+  applyReaderSettings(fontSize, lineHeight);
+}
+
+function setReaderFontSize(value) {
+  const fontSize = clampNumber(Number(value), 15, 24, DEFAULT_READER_SETTINGS.fontSize);
+  const lineHeight = clampNumber(
+    Number(localStorage.getItem("mingmo-reader-line-height")),
+    1.5,
+    2.2,
+    DEFAULT_READER_SETTINGS.lineHeight,
+  );
+  applyReaderSettings(fontSize, lineHeight);
+}
+
+function setReaderLineHeight(value) {
+  const fontSize = clampNumber(
+    Number(localStorage.getItem("mingmo-reader-font-size")),
+    15,
+    24,
+    DEFAULT_READER_SETTINGS.fontSize,
+  );
+  const lineHeight = clampNumber(Number(value), 1.5, 2.2, DEFAULT_READER_SETTINGS.lineHeight);
+  applyReaderSettings(fontSize, lineHeight);
+}
+
+function applyReaderSettings(fontSize, lineHeight) {
+  const normalizedLineHeight = Number(lineHeight.toFixed(2));
+  document.documentElement.style.setProperty("--reader-font-size", `${fontSize}px`);
+  document.documentElement.style.setProperty("--reader-line-height", String(normalizedLineHeight));
+  localStorage.setItem("mingmo-reader-font-size", String(fontSize));
+  localStorage.setItem("mingmo-reader-line-height", String(normalizedLineHeight));
+  syncReaderSettingControls(fontSize, normalizedLineHeight);
+}
+
+function syncReaderSettingControls(fontSize, lineHeight) {
+  const lineHeightText = lineHeight.toFixed(2);
+  els.fontSizeRange.value = String(fontSize);
+  els.mobileFontSizeRange.value = String(fontSize);
+  els.fontSizeValue.textContent = `${fontSize}px`;
+  els.mobileFontSizeValue.textContent = `${fontSize}px`;
+  els.lineHeightRange.value = lineHeightText;
+  els.mobileLineHeightRange.value = lineHeightText;
+  els.lineHeightValue.textContent = lineHeightText;
+  els.mobileLineHeightValue.textContent = lineHeightText;
+}
+
+function clampNumber(value, min, max, fallback) {
+  if (!Number.isFinite(value)) return fallback;
+  return Math.min(max, Math.max(min, value));
 }
 
 function toggleMobileMenu() {

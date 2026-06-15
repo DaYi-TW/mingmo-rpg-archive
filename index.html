@@ -35,6 +35,22 @@
             <option value="gray">冷灰</option>
           </select>
 
+          <div class="reader-setting">
+            <div class="range-row">
+              <label class="field-label" for="fontSizeRange">字型大小</label>
+              <output id="fontSizeValue" class="range-value" for="fontSizeRange">18px</output>
+            </div>
+            <input id="fontSizeRange" class="range-input" type="range" min="15" max="24" step="1" value="18">
+          </div>
+
+          <div class="reader-setting">
+            <div class="range-row">
+              <label class="field-label" for="lineHeightRange">行間距</label>
+              <output id="lineHeightValue" class="range-value" for="lineHeightRange">1.82</output>
+            </div>
+            <input id="lineHeightRange" class="range-input" type="range" min="1.5" max="2.2" step="0.05" value="1.82">
+          </div>
+
           <nav class="nav-block" aria-label="快速文件">
             <button class="nav-item active" data-file="rpg/_index.md">現況總覽</button>
             <button class="nav-item" data-file="rpg/military.md">軍力軍備</button>
@@ -144,6 +160,20 @@
           <option value="jade">墨綠</option>
           <option value="gray">冷灰</option>
         </select>
+        <div class="reader-setting">
+          <div class="range-row">
+            <label class="field-label" for="mobileFontSizeRange">字型大小</label>
+            <output id="mobileFontSizeValue" class="range-value" for="mobileFontSizeRange">18px</output>
+          </div>
+          <input id="mobileFontSizeRange" class="range-input" type="range" min="15" max="24" step="1" value="18">
+        </div>
+        <div class="reader-setting">
+          <div class="range-row">
+            <label class="field-label" for="mobileLineHeightRange">行間距</label>
+            <output id="mobileLineHeightValue" class="range-value" for="mobileLineHeightRange">1.82</output>
+          </div>
+          <input id="mobileLineHeightRange" class="range-input" type="range" min="1.5" max="2.2" step="0.05" value="1.82">
+        </div>
       </div>
     </section>
   </body>
